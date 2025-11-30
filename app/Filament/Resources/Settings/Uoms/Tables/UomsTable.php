@@ -37,7 +37,6 @@ class UomsTable
                 EditAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make(),
-                ForceDeleteAction::make()
             ])
             ->toolbarActions([
                 // 
