@@ -6,6 +6,7 @@ use App\Policies\Settings\UomPolicy;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -22,6 +23,11 @@ class Uom extends Model
         'name',
         'abbreviation',
     ];
+
+    public function itemMaterials(): HasMany
+    {
+        return $this->hasMany(ItemMaterial::class);
+    }
 
     /**
      * Log Activities

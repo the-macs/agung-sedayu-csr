@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\ItemMaterials\Tables;
+namespace App\Filament\Resources\Settings\ItemMaterials\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
 
 class ItemMaterialsTable
 {
@@ -13,7 +14,17 @@ class ItemMaterialsTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('quantity')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('uom.name')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -22,9 +33,7 @@ class ItemMaterialsTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                //
             ]);
     }
 }

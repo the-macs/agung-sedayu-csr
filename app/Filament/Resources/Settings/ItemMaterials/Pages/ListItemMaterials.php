@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\ItemMaterials\Pages;
+namespace App\Filament\Resources\Settings\ItemMaterials\Pages;
 
-use App\Filament\Resources\ItemMaterials\ItemMaterialResource;
+use App\Filament\Resources\Settings\ItemMaterials\ItemMaterialResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

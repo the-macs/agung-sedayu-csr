@@ -21,5 +21,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RolePermissionSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(UomSeeder::class);
+        $this->call(ItemMaterialSeeder::class);
     }
 }

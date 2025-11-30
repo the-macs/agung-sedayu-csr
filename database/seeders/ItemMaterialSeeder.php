@@ -17,13 +17,13 @@ class ItemMaterialSeeder extends Seeder
             [
                 'name' => 'Pasir',
                 'description' => 'Pasir',
-                'quantity' => 1,
+                'quantity' => 4,
                 'uom' => 'colt',
             ],
             [
                 'name' => 'Hebel',
                 'description' => 'Hebel',
-                'quantity' => 10,
+                'quantity' => 11,
                 'uom' => 'm3',
             ],
             [
@@ -371,7 +371,7 @@ class ItemMaterialSeeder extends Seeder
         ];
 
         foreach ($materials as $material) {
-            $uom = Uom::where('name', $material['uom'])->first();
+            $uom = Uom::where('abbreviation', $material['uom'])->first();
 
             ItemMaterial::create([
                 'name' => $material['name'],
