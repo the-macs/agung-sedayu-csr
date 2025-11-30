@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Uom;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UomSeeder extends Seeder
@@ -28,7 +27,8 @@ class UomSeeder extends Seeder
             ['name' => 'Dus','abbreviation' => 'dus'],
             ['name' => 'Pcs','abbreviation' => 'pcs'],
             ['name' => 'Pail','abbreviation' => 'pail'],
-            ['name' => 'Kaleng','abbreviation' => 'klg']
+            ['name' => 'Kaleng','abbreviation' => 'klg'],
+            ['name' => 'Lumpsum','abbreviation' => 'ls'],
         ];
 
         foreach ($uoms as $uom) {
