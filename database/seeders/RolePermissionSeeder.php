@@ -42,6 +42,20 @@ class RolePermissionSeeder extends Seeder
                 'update.seo.setting',
                 'bypass.maintenance.setting',
             ],
+            'item.material' => [
+                'view.any.item.material',
+                'view.item.material',
+                'create.item.material',
+                'update.item.material',
+                'delete.item.material',
+            ],
+            'uom' => [
+                'view.any.uom',
+                'view.uom',
+                'create.uom',
+                'update.uom',
+                'delete.uom',
+            ],
         ];
 
         // Create permissions grouped by "group"
