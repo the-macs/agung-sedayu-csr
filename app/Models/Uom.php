@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+class Uom extends Model
+{
+    use HasUlids, LogsActivity, SoftDeletes;
+
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'id',
+        'name',
+        'abbreviation',
+    ];
+
+    /**
+     * Log Activities
+     *
+     * @return LogOptions
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name','abbreviation'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('uom')
+            ->setDescriptionForEvent(fn(string $eventName) => "Uom has been {$eventName}");
+    }
+}
