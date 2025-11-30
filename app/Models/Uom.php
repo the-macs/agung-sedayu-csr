@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Policies\Settings\UomPolicy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+#[UsePolicy(UomPolicy::class)]
 class Uom extends Model
 {
     use HasUlids, LogsActivity, SoftDeletes;
