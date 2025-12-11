@@ -26,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        URL::forceRootUrl(config('app.url'));
+
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
             fn(): string => '<style>
