@@ -6,6 +6,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,7 +28,13 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        Livewire::forceAssetInjection(); // Forces Livewire to use your config
+        Livewire::setScriptRoute(function ($handle) {
+            return Route::get('/vendor/livewire/livewire.js', $handle);
+        });
+
+        Livewire::setUpdateRoute(function ($handle) {
+            return Route::post('/vendor/livewire/update', $handle);
+        });
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
