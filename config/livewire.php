@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'asset_url' => env('APP_URL') . '/livewire.js',
+    'asset_url' => env('APP_URL') . '/livewire/livewire.js',
     /*
     |---------------------------------------------------------------------------
     | Class Namespace
