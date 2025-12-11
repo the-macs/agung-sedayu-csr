@@ -3,7 +3,7 @@
 return [
     'asset_url' => env('APP_URL') . '/livewire/livewire.js',
 
-    'update_route' => true,
+    'update_uri' => env('APP_URL') . '/livewire/update',
 
     /*
     |---------------------------------------------------------------------------
