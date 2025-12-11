@@ -27,10 +27,6 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        Livewire::setScriptRoute(function ($handle) {
-            return route('livewire.message', ['id' => $handle]);
-        });
-
         Livewire::forceAssetInjection(); // Forces Livewire to use your config
 
         FilamentView::registerRenderHook(
