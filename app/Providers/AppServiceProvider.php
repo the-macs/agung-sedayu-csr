@@ -6,6 +6,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
