@@ -24,17 +24,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (config('app.env') === 'production') {
-            URL::forceScheme('https');
-        }
-
         Livewire::setScriptRoute(function ($handle) {
-            return Route::get('/vendor/livewire/livewire.js', $handle);
+            return Route::get('/csr-bedah-rumah/vendor/livewire/livewire.js', $handle);
         });
 
         Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/vendor/livewire/update', $handle);
+            return Route::post('/csr-bedah-rumah/vendor/livewire/update', $handle);
         });
+
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
