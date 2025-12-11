@@ -22,6 +22,8 @@ class MyLogin extends Login
      */
     public function authenticate(): ?LoginResponse
     {
+        dd('Esa');
+
         try {
             $this->rateLimit(setting('max_login_attempts', 5));
         } catch (TooManyRequestsException $exception) {
@@ -31,7 +33,6 @@ class MyLogin extends Login
         }
 
         $data = $this->form->getState();
-        dd('Esa');
         if (! Auth::attempt([
             'username' => $data['username'],
             'password' => $data['password'],
