@@ -3,7 +3,7 @@
 namespace App\Providers\Filament;
 
 use AchyutN\FilamentLogViewer\FilamentLogViewer;
-use App\Filament\Pages\Auth\CustomLogin;
+use App\Filament\Pages\Auth\MyLogin;
 use App\Http\Middleware\CheckMaintenanceMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -30,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login(CustomLogin::class)
+            ->login(MyLogin::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -44,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 PanelsRenderHook::USER_MENU_PROFILE_BEFORE,
-                fn () => view('filament.admin.components.status-indicator'),
+                fn() => view('filament.admin.components.status-indicator'),
             )
             ->middleware([
                 EncryptCookies::class,
@@ -63,7 +63,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentLogViewer::make()
-                    ->authorize(fn () => Auth::user()->can('view.any.log.system'))
+                    ->authorize(fn() => Auth::user()->can('view.any.log.system'))
                     ->navigationGroup('Logs')
                     ->navigationIcon('heroicon-o-bug-ant')
                     ->navigationLabel('System Logs')
@@ -72,7 +72,7 @@ class AdminPanelProvider extends PanelProvider
                     ->pollingTime(null), // Set to null to disable polling
             ])
             ->topNavigation(setting('top_navigation', false))
-            ->brandLogo(fn () => view('filament.admin.components.header-logo'))
+            ->brandLogo(fn() => view('filament.admin.components.header-logo'))
             ->font('Outfit', url: asset('fonts/filament/filament/Outfit/Outfit-VariableFont_wght.ttf'))
             // Based on Settings
             ->favicon(setting('site_favicon', null))
