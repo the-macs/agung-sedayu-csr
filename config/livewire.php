@@ -2,6 +2,9 @@
 
 return [
     'asset_url' => env('APP_URL') . '/livewire/livewire.js',
+
+    'update_route' => true,
+
     /*
     |---------------------------------------------------------------------------
     | Class Namespace
