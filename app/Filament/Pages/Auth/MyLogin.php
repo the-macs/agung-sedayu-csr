@@ -31,9 +31,8 @@ class MyLogin extends Login
         }
 
         $data = $this->form->getState();
-
+        dd('Esa');
         if (! Auth::attempt([
-            dd('Esa');
             'username' => $data['username'],
             'password' => $data['password'],
         ], $this->remember)) {
