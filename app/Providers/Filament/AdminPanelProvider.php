@@ -20,6 +20,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -56,7 +57,63 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-            ])
+            ]) // ADD THIS CRITICAL SECTION:
+            ->renderHook(
+                'panels::body.start',
+                fn(): string => Blade::render(<<<'HTML'
+                <script>
+                    // Fix for Livewire in subdirectory
+                    document.addEventListener('livewire:init', function() {
+                        console.log('Livewire fix activated for subdirectory');
+                        
+                        // Store the correct base URL
+                        window.livewireBaseUrl = '<?php echo config("app.url"); ?>';
+                        
+                        // Hook into ALL Livewire requests
+                        Livewire.hook('request', ({ uri, options, succeed, fail }) => {
+                            console.log('Livewire request to:', uri);
+                            
+                            // Force absolute URL for Livewire endpoints
+                            if (uri.includes('livewire/update')) {
+                                const fullUrl = window.livewireBaseUrl + '/livewire/update';
+                                console.log('Redirecting to:', fullUrl);
+                                options.url = fullUrl;
+                                
+                                // Ensure headers are preserved
+                                if (!options.headers) options.headers = {};
+                                options.headers['X-Requested-With'] = 'XMLHttpRequest';
+                                options.headers['Accept'] = 'application/json, text/plain, */*';
+                            }
+                        });
+                        
+                        // Also override the internal Livewire function
+                        if (window.Livewire) {
+                            const originalUpdateUri = window.Livewire.updateUri;
+                            window.Livewire.updateUri = function(uri) {
+                                if (uri.startsWith('/livewire/')) {
+                                    return window.livewireBaseUrl + uri;
+                                }
+                                return originalUpdateUri ? originalUpdateUri(uri) : uri;
+                            };
+                        }
+                    });
+                    
+                    // Fallback: Direct window.fetch interception
+                    const originalFetch = window.fetch;
+                    window.fetch = function(resource, init) {
+                        if (typeof resource === 'string') {
+                            // Fix Livewire update requests
+                            if (resource.includes('/livewire/update') && resource.startsWith('/')) {
+                                const fixedUrl = '<?php echo config("app.url"); ?>' + resource;
+                                console.log('Fetch intercepted, fixing URL:', resource, '→', fixedUrl);
+                                resource = fixedUrl;
+                            }
+                        }
+                        return originalFetch.call(this, resource, init);
+                    };
+                </script>
+            HTML)
+            )
             ->authMiddleware([
                 Authenticate::class,
                 CheckMaintenanceMode::class,

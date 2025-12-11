@@ -6,8 +6,6 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
-use Illuminate\Support\Facades\Route;
-use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,14 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Livewire::setScriptRoute(function ($handle) {
-            return Route::get('/csr-bedah-rumah/vendor/livewire/livewire.js', $handle);
-        });
-
-        Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/csr-bedah-rumah/vendor/livewire/update', $handle);
-        });
-
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
