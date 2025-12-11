@@ -62,55 +62,73 @@ class AdminPanelProvider extends PanelProvider
                 'panels::body.start',
                 fn(): string => Blade::render(<<<'HTML'
                 <script>
-                    // Fix for Livewire in subdirectory
+                    // FIXED: Proper Livewire subdirectory fix
                     document.addEventListener('livewire:init', function() {
-                        console.log('Livewire fix activated for subdirectory');
+                        console.log('[Livewire Fix] Initializing for subdirectory');
                         
-                        // Store the correct base URL
-                        window.livewireBaseUrl = '<?php echo config("app.url"); ?>';
+                        const baseUrl = '<?php echo config("app.url"); ?>';
+                        console.log('[Livewire Fix] Base URL:', baseUrl);
                         
-                        // Hook into ALL Livewire requests
-                        Livewire.hook('request', ({ uri, options, succeed, fail }) => {
-                            console.log('Livewire request to:', uri);
-                            
-                            // Force absolute URL for Livewire endpoints
-                            if (uri.includes('livewire/update')) {
-                                const fullUrl = window.livewireBaseUrl + '/livewire/update';
-                                console.log('Redirecting to:', fullUrl);
-                                options.url = fullUrl;
+                        // SAFE VERSION: Check for uri before using it
+                        Livewire.hook('request', ({ options, succeed, fail }) => {
+                            // Check if options.url exists and fix it
+                            if (options && options.url) {
+                                console.log('[Livewire Fix] Request URL:', options.url);
                                 
-                                // Ensure headers are preserved
-                                if (!options.headers) options.headers = {};
-                                options.headers['X-Requested-With'] = 'XMLHttpRequest';
-                                options.headers['Accept'] = 'application/json, text/plain, */*';
+                                // Fix Livewire update requests
+                                if (typeof options.url === 'string' && 
+                                    options.url.includes('/livewire/update') &&
+                                    !options.url.startsWith('http')) {
+                                    
+                                    const fixedUrl = baseUrl + (options.url.startsWith('/') ? '' : '/') + options.url;
+                                    console.log('[Livewire Fix] Fixed URL:', fixedUrl);
+                                    options.url = fixedUrl;
+                                }
                             }
+                            
+                            // Continue with the request
+                            succeed(({ status, response }) => {
+                                return { status, response };
+                            });
                         });
                         
-                        // Also override the internal Livewire function
-                        if (window.Livewire) {
-                            const originalUpdateUri = window.Livewire.updateUri;
-                            window.Livewire.updateUri = function(uri) {
-                                if (uri.startsWith('/livewire/')) {
-                                    return window.livewireBaseUrl + uri;
+                        // Alternative: Direct fetch interception (safer)
+                        const originalFetch = window.fetch;
+                        window.fetch = function(resource, init) {
+                            if (typeof resource === 'string') {
+                                // Fix Livewire update requests
+                                if (resource.includes('/livewire/update') && 
+                                    !resource.startsWith('http') &&
+                                    !resource.startsWith(baseUrl)) {
+                                    
+                                    const fixedResource = baseUrl + (resource.startsWith('/') ? '' : '/') + resource;
+                                    console.log('[Livewire Fix] Fetch intercepted:', resource, '→', fixedResource);
+                                    resource = fixedResource;
                                 }
-                                return originalUpdateUri ? originalUpdateUri(uri) : uri;
-                            };
-                        }
+                            }
+                            return originalFetch.call(this, resource, init);
+                        };
+                        
+                        console.log('[Livewire Fix] Applied successfully');
                     });
                     
-                    // Fallback: Direct window.fetch interception
-                    const originalFetch = window.fetch;
-                    window.fetch = function(resource, init) {
-                        if (typeof resource === 'string') {
-                            // Fix Livewire update requests
-                            if (resource.includes('/livewire/update') && resource.startsWith('/')) {
-                                const fixedUrl = '<?php echo config("app.url"); ?>' + resource;
-                                console.log('Fetch intercepted, fixing URL:', resource, '→', fixedUrl);
-                                resource = fixedUrl;
+                    // Fallback for early requests
+                    (function() {
+                        const baseUrl = '<?php echo config("app.url"); ?>';
+                        const originalOpen = XMLHttpRequest.prototype.open;
+                        
+                        XMLHttpRequest.prototype.open = function(method, url) {
+                            if (url && typeof url === 'string' && 
+                                url.includes('/livewire/update') && 
+                                !url.startsWith('http')) {
+                                
+                                const fixedUrl = baseUrl + (url.startsWith('/') ? '' : '/') + url;
+                                console.log('[Livewire Fix] XHR fixed:', url, '→', fixedUrl);
+                                return originalOpen.call(this, method, fixedUrl);
                             }
-                        }
-                        return originalFetch.call(this, resource, init);
-                    };
+                            return originalOpen.call(this, method, url);
+                        };
+                    })();
                 </script>
             HTML)
             )
