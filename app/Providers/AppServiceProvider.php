@@ -6,6 +6,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
+use Illuminate\Support\Facades\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +28,11 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Force root URL - this is KEY for subdirectories
-        URL::forceRootUrl(config('app.url'));
+        app($this::class)->setScriptRoute(function ($handle) {
+            return config('app.debug')
+                ? Route::get('/csr-bedah-rumah/livewire/livewire.js', $handle)
+                : Route::get('/csr-bedah-rumah/livewire/livewire.min.js', $handle);
+        });
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
