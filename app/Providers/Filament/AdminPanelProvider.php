@@ -36,6 +36,10 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
+            ->assetBaseUrl(config('app.url') . '/vendor/filament')
+            ->livewireScriptConfiguration([
+                'asset_url' => config('app.url') . '/livewire',
+            ])
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
