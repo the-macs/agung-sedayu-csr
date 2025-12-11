@@ -13,7 +13,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
 
-class CustomLogin extends Login
+class MyLogin extends Login
 {
     protected $remember = true;
 

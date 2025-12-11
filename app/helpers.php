@@ -5,7 +5,6 @@ use App\Services\SettingService;
 if (!function_exists('setting')) {
     function setting(?string $key = null, $default = null)
     {
-
         // 1. Static cache to check if the table existence has been determined this request
         static $tableExists = null;
 
