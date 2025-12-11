@@ -2,8 +2,9 @@
 
 return [
     'asset_url' => env('APP_URL') . '/livewire/livewire.js',
-
-    'update_uri' => env('APP_URL') . '/livewire/update',
+    'app_url' => env('APP_URL'),
+    'update_uri' => '/livewire/update', // ← Use relative path, not full URL
+    'manifest_path' => null,
 
     /*
     |---------------------------------------------------------------------------
