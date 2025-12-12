@@ -13,4 +13,10 @@ class CreateUser extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    // make assign role to user after create
+    protected function afterCreate(): void
+    {
+        $this->record->assignRole('user');
+    }
 }
