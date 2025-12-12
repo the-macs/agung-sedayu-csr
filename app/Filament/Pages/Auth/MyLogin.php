@@ -46,8 +46,7 @@ class MyLogin extends Login
         $user = Filament::auth()->user();
 
         if (
-            ($user instanceof FilamentUser) &&
-            (! $user->canAccessPanel(Filament::getCurrentPanel()))
+            ($user instanceof FilamentUser)
         ) {
             Filament::auth()->logout();
 
