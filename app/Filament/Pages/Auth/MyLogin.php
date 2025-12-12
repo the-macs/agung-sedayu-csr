@@ -45,13 +45,13 @@ class MyLogin extends Login
 
         $user = Filament::auth()->user();
 
-        if (
-            ($user instanceof FilamentUser)
-        ) {
-            Filament::auth()->logout();
+        // if (
+        //     ($user instanceof FilamentUser)
+        // ) {
+        //     Filament::auth()->logout();
 
-            $this->throwFailureValidationException();
-        }
+        //     $this->throwFailureValidationException();
+        // }
 
         session()->regenerate();
 
