@@ -18,7 +18,7 @@ use Spatie\Permission\Traits\HasRoles;
 #[UsePolicy(UserPolicy::class)]
 class User extends Authenticatable implements FilamentUser
 {
-    use HasRoles, HasUlids, Notifiable, SoftDeletes,LogsActivity;
+    use HasRoles, HasUlids, Notifiable, SoftDeletes, LogsActivity;
 
     protected $keyType = 'string';
 
@@ -63,9 +63,9 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return Auth::user()->hasAnyRole(['super-admin', 'admin']);
+        return true;
     }
-    
+
     /**
      * Log Activities
      *
@@ -74,7 +74,7 @@ class User extends Authenticatable implements FilamentUser
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name','username', 'email', 'phone'])
+            ->logOnly(['name', 'username', 'email', 'phone'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('user')
