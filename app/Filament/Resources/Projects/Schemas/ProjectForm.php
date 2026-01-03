@@ -349,14 +349,14 @@ class ProjectForm
             ->persistStepInQueryString()
             ->columnSpanFull();
 
-        if (request()->routeIs('*create')) { // or $this->getContext() === 'create' if inside Livewire
-            $wizard->submitAction(
-                Action::make('submit')
-                    ->label('Simpan Data Project')
-                    ->icon('heroicon-o-check')
-                    ->action('create')
-            );
-        }
+        // if (request()->routeIs('*create')) {
+        $wizard->submitAction(
+            Action::make('submit')
+                ->label('Simpan Data Project')
+                ->icon('heroicon-o-check')
+                ->action('create')
+        );
+        // }
 
         return $schema
             ->components([

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'asset_url' => env('APP_URL') . '/livewire/livewire.js',
+    'asset_url' =>  env('APP_ENV') === 'production' ? env('APP_URL') . '/livewire/livewire.js' : null,
     'app_url' => env('APP_URL'),
     'update_uri' => '/livewire/update', // ← Use relative path, not full URL
     'manifest_path' => null,
