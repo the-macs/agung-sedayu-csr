@@ -2,19 +2,14 @@
 
 namespace App\Filament\Resources\Projects\RelationManagers;
 
-use App\Filament\Resources\ProjectMaterials\ProjectMaterialResource;
-use App\Filament\Resources\ProjectMaterials\RelationManagers\TransactionsRelationManager;
 use App\Models\ProjectMaterial;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions;
 use Filament\Actions\Action;
-use Filament\Infolists;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
