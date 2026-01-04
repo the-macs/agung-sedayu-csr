@@ -36,11 +36,17 @@ class UserForm
                     ->maxLength(20)
                     ->nullable(),
 
+                Forms\Components\Select::make('roles')
+                    ->multiple()
+                    ->relationship('roles', 'name')
+                    ->preload()
+                    ->label('Roles'),
+
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->required(fn (string $context) => $context === 'create')
-                    ->dehydrateStateUsing(fn ($state) => ! empty($state) ? Hash::make($state) : null)
-                    ->dehydrated(fn ($state) => filled($state))
+                    ->required(fn(string $context) => $context === 'create')
+                    ->dehydrateStateUsing(fn($state) => ! empty($state) ? Hash::make($state) : null)
+                    ->dehydrated(fn($state) => filled($state))
                     ->label('Password'),
             ]);
     }
