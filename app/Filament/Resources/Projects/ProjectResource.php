@@ -30,7 +30,15 @@ class ProjectResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return ProjectForm::configure($schema);
+        $operation = null;
+
+        if ($schema->getOperation()) {
+            $operation = $schema->getOperation();
+        }
+
+        return $schema->schema(
+            ProjectForm::configure($schema, $operation)->getComponents()
+        );
     }
 
     public static function infolist(Schema $schema): Schema

@@ -15,7 +15,7 @@ use Filament\Schemas\Schema;
 
 class ProjectForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, ?string $operation = null): Schema
     {
         $wizard = Wizard::make([
             // STEP 1: DATA DIRI
@@ -69,7 +69,7 @@ class ProjectForm
                                 ->required()
                                 ->tel()
                                 ->maxLength(15)
-                                ->label('No. WhatsApp')
+                                ->label('No.  WhatsApp')
                                 ->placeholder('Contoh: 081234567890'),
                             Select::make('status_kepemilikan')
                                 ->required()
@@ -106,7 +106,7 @@ class ProjectForm
                             Select::make('anggota_rentan')
                                 ->required()
                                 ->options(Project::ANGGOTA_RENTAN)
-                                ->label('Apakah ada anggota keluarga rentan?')
+                                ->label('Apakah ada anggota keluarga rentan? ')
                                 ->placeholder('Pilih jika ada'),
                             Select::make('terdaftar_bansos')
                                 ->required()
@@ -275,7 +275,7 @@ class ProjectForm
                                 ->required()
                                 ->url()
                                 ->label('Link Google Maps')
-                                ->placeholder('https://maps.google.com/...')
+                                ->placeholder('https://maps.google.com/.. .')
                                 ->columnSpanFull()
                                 ->helperText('Salin link Google Maps lokasi rumah'),
                         ]),
@@ -344,19 +344,25 @@ class ProjectForm
                         ])->columns(2),
                 ]),
         ])
-            // ->skippable(fn($context) => $context !== 'create')
-            ->skippable()
-            ->persistStepInQueryString()
+            ->skippable(fn($operation) => $operation !== 'create')
             ->columnSpanFull();
 
-        // if (request()->routeIs('*create')) {
-        $wizard->submitAction(
-            Action::make('submit')
-                ->label('Simpan Data Project')
-                ->icon('heroicon-o-check')
-                ->action('create')
-        );
-        // }
+        // Add submit action based on operation
+        if ($operation === 'create') {
+            $wizard->submitAction(
+                Action::make('submit')
+                    ->label('Simpan Data Project')
+                    ->icon('heroicon-o-check')
+                    ->action('create')
+            );
+        } elseif ($operation === 'edit') {
+            $wizard->submitAction(
+                Action::make('submit')
+                    ->label('Update Data Project')
+                    ->icon('heroicon-o-check')
+                    ->action('save')
+            );
+        }
 
         return $schema
             ->components([
