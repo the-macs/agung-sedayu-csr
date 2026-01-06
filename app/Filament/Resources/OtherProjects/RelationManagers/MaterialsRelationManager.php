@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Projects\RelationManagers;
 
+use App\Models\OtherProject;
 use App\Models\ProjectMaterial;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -16,10 +17,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class MaterialsRelationManager extends RelationManager
 {
     protected static string $relationship = 'materials';
+
+    protected static bool $canViewForRecord = true;
+
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
 
     public function form(Schema $schema): Schema
     {
@@ -93,11 +102,30 @@ class MaterialsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->label('Add Material')
+                    ->after(function (CreateAction $action) {
+                        $record = $action->getRecord();
+
+                        if ($record->quantity > 0) {
+                            $record->transactions()->create([
+                                'quantity' => $record->quantity,
+                                'type' => 'in',
+                                'status' => 'approved',
+                                'note' => 'Initial stock',
+                                'request_by' => Auth::id(),
+                                'approved_by' => Auth::id(),
+                            ]);
+                        }
+
+                        Notification::make()
+                            ->title('Material added successfully')
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn() => $this->getOwnerRecord()->status === OtherProject::STATUS_ONGOING),
             ])
             ->recordActions([
-                Actions\EditAction::make(),
-                // Stock In Action
                 Action::make('stockIn')
                     ->label('Stock In')
                     ->icon('heroicon-o-plus-circle')
@@ -181,25 +209,22 @@ class MaterialsRelationManager extends RelationManager
                     ->color('success')
                     ->modalHeading(fn($record) => "Transactions - {$record->name}")
                     ->modalContent(function ($record) {
+                        Log::info($record);
                         $transactions = $record->transactions()
                             ->with(['requester', 'approver'])
                             ->latest()
                             ->paginate(10);
 
-                        return view('filament.custom.project.transaction-table', [
+                        return view('filament.custom.other-project.transaction-table', [
                             'transactions' => $transactions,
                             'material' => $record,
                         ]);
                     })
                     ->modalSubmitAction(false)
                     ->modalWidth('7xl'),
-                Actions\DeleteAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DissociateBulkAction::make(),
-                    DeleteBulkAction::make(),
-                ]),
+                // 
             ]);
     }
 }

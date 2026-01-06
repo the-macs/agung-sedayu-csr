@@ -24,7 +24,12 @@ class ProjectMaterial extends Model
 
     public function project(): BelongsTo
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Project::class, 'reference_id');
+    }
+
+    public function otherProject(): BelongsTo
+    {
+        return $this->belongsTo(OtherProject::class, 'reference_id');
     }
 
     public function transactions(): HasMany

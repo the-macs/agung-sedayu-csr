@@ -11,24 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('project_weekly_reports', function (Blueprint $table) {
+        Schema::create('other_project_weekly_reports', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->ulid('project_id');
+            $table->ulid('other_project_id');
             $table->integer('week_number'); // 1, 2, 3, 4
             $table->string('title');
             $table->string('focus');
-            $table->json('checklists'); // Store completed checklist items
-            $table->string('foto_tampak_depan')->nullable();
-            $table->string('foto_tampak_samping')->nullable();
-            $table->string('foto_dalam_rumah')->nullable();
-            $table->string('foto_toilet')->nullable();
-            $table->string('foto_dapur')->nullable();
+            $table->json('photos')->nullable();
             $table->text('notes')->nullable();
             $table->ulid('reported_by')->nullable();
             $table->timestamps();
 
             // Ensure one report per week per project
-            $table->unique(['project_id', 'week_number']);
+            $table->unique(['other_project_id', 'week_number']);
         });
     }
 
@@ -37,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('project_weekly_reports');
+        Schema::dropIfExists('other_project_weekly_reports');
     }
 };

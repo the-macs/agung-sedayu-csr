@@ -7,7 +7,8 @@ use Filament\Auth\Http\Responses\LoginResponse;
 use Filament\Auth\Pages\Login;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
-use Filament\Models\Contracts\FilamentUser;
+use Filament\Forms\Components\Password;
+use Filament\Forms\Components\Checkbox;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ class MyLogin extends Login
     public function authenticate(): ?LoginResponse
     {
         try {
+            // adjust this setting call to match your app or hardcode a number
             $this->rateLimit(setting('max_login_attempts', 5));
         } catch (TooManyRequestsException $exception) {
             $this->getRateLimitedNotification($exception)?->send();
@@ -31,10 +33,16 @@ class MyLogin extends Login
         }
 
         $data = $this->form->getState();
+
+        $remember = $data['remember'] ?? $this->remember;
+
+        // optional normalization; remove mb_strtolower() if you want case-sensitive usernames
+        $username = isset($data['username']) ? mb_strtolower(trim($data['username'])) : null;
+
         if (! Auth::attempt([
-            'username' => $data['username'],
-            'password' => $data['password'],
-        ], $this->remember)) {
+            'username' => $username,
+            'password' => $data['password'] ?? null,
+        ], $remember)) {
             Notification::make()
                 ->title(__('auth.failed'))
                 ->danger()
@@ -45,42 +53,43 @@ class MyLogin extends Login
 
         $user = Filament::auth()->user();
 
-        // if (
-        //     ($user instanceof FilamentUser) &&
-        //     (! $user->canAccessPanel(Filament::getCurrentPanel()))
-        // ) {
+        // Optional: restrict access to the panel
+        // if (($user instanceof \Filament\Models\Contracts\FilamentUser) && (! $user->canAccessPanel(Filament::getCurrentPanel()))) {
         //     Filament::auth()->logout();
-
         //     $this->throwFailureValidationException();
         // }
 
         session()->regenerate();
 
-        activity('auth')
-            ->by($user)
-            ->event('login')
-            ->withProperties([
-                'attributes' => [
-                    'ip' => request()->ip(),
-                    'user_agent' => request()->userAgent(),
-                ],
-            ])
-            ->log('User logged in');
+        // optional activity logging if you use the activity() helper
+        if (function_exists('activity')) {
+            activity('auth')
+                ->by($user)
+                ->event('login')
+                ->withProperties([
+                    'attributes' => [
+                        'ip' => request()->ip(),
+                        'user_agent' => request()->userAgent(),
+                    ],
+                ])
+                ->log('User logged in');
+        }
 
         return app(LoginResponse::class);
     }
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('username')
-                    ->required()
-                    ->label('Username')
-                    ->autofocus()
-                    ->extraInputAttributes(['tabindex' => 1]),
-                $this->getPasswordFormComponent(),
-                $this->getRememberFormComponent(),
-            ]);
+        return $schema->components([
+            TextInput::make('username')
+                ->label('Username')
+                ->required()
+                ->autocomplete()
+                ->autofocus()
+                ->extraInputAttributes(['tabindex' => 1]),
+
+            $this->getPasswordFormComponent(),
+            $this->getRememberFormComponent(),
+        ]);
     }
 }

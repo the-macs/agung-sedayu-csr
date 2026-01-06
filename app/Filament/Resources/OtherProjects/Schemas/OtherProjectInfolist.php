@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\ProjectWeeklyReports\Schemas;
+namespace App\Filament\Resources\OtherProjects\Schemas;
 
 use Filament\Schemas\Schema;
 
-class ProjectWeeklyReportInfolist
+class OtherProjectInfolist
 {
     public static function configure(Schema $schema): Schema
     {

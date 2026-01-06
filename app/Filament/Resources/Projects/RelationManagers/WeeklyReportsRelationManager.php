@@ -2,33 +2,32 @@
 
 namespace App\Filament\Resources\Projects\RelationManagers;
 
-use App\Filament\Resources\ProjectWeeklyReports\ProjectWeeklyReportResource;
 use App\Models\ProjectWeeklyReport;
 use Filament\Actions\Action;
-use Filament\Actions\AssociateAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
-use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class WeeklyReportsRelationManager extends RelationManager
 {
     protected static string $relationship = 'weeklyReports';
+
+    protected static bool $canViewForRecord = true;
+
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
 
     public function form(Schema $schema): Schema
     {
@@ -36,40 +35,46 @@ class WeeklyReportsRelationManager extends RelationManager
             ->components([
                 Section::make('Informasi Mingguan')
                     ->schema([
-                        Select::make('project_id')
-                            ->relationship('project', 'nama_lengkap')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                if ($state) {
-                                    $nextWeek = ProjectWeeklyReport::getNextWeekNumber($state);
-                                    $set('week_number', $nextWeek);
-
-                                    $weekDetails = ProjectWeeklyReport::getWeekDetails($nextWeek);
-                                    $set('title', $weekDetails['title'] ?? '');
-                                    $set('focus', $weekDetails['focus'] ?? '');
-                                }
-                            }),
+                        // Remove the project_id Select - it's automatically handled by the relation
 
                         TextInput::make('week_number')
                             ->required()
                             ->numeric()
                             ->minValue(1)
                             ->maxValue(4)
+                            ->default(function () {
+                                return ProjectWeeklyReport::getNextWeekNumber(
+                                    $this->getOwnerRecord()->id
+                                );
+                            })
                             ->disabled()
                             ->dehydrated(),
 
                         TextInput::make('title')
                             ->required()
                             ->maxLength(255)
+                            ->default(function (callable $get) {
+                                $weekNumber = $get('week_number');
+                                if ($weekNumber) {
+                                    $weekDetails = ProjectWeeklyReport::getWeekDetails($weekNumber);
+                                    return $weekDetails['title'] ?? '';
+                                }
+                                return '';
+                            })
                             ->disabled()
                             ->dehydrated(),
 
                         TextInput::make('focus')
                             ->required()
                             ->maxLength(255)
+                            ->default(function (callable $get) {
+                                $weekNumber = $get('week_number');
+                                if ($weekNumber) {
+                                    $weekDetails = ProjectWeeklyReport::getWeekDetails($weekNumber);
+                                    return $weekDetails['focus'] ?? '';
+                                }
+                                return '';
+                            })
                             ->disabled()
                             ->dehydrated(),
                     ])
@@ -79,7 +84,9 @@ class WeeklyReportsRelationManager extends RelationManager
                     ->schema([
                         CheckboxList::make('checklists')
                             ->options(function (callable $get) {
-                                $weekNumber = $get('week_number');
+                                $weekNumber = $get('week_number') ?? ProjectWeeklyReport::getNextWeekNumber(
+                                    $this->getOwnerRecord()->id
+                                );
                                 return collect(ProjectWeeklyReport::getWeekChecklists($weekNumber))
                                     ->mapWithKeys(fn($item) => [$item => $item]);
                             })
@@ -90,16 +97,41 @@ class WeeklyReportsRelationManager extends RelationManager
 
                 Section::make('Dokumentasi & Bukti')
                     ->schema([
-                        FileUpload::make('attachments')
-                            ->multiple()
+                        FileUpload::make('foto_tampak_depan')
+                            ->required()
                             ->image()
-                            ->directory('project-reports/weekly')
-                            ->maxFiles(10)
-                            ->maxSize(5120) // 5MB
-                            ->label('Foto Dokumentasi')
-                            ->helperText('Upload foto progress pekerjaan minggu ini')
-                            ->columnSpanFull(),
-                    ]),
+                            ->directory('weekly_report/tampak-depan')
+                            ->maxSize(2048)
+                            ->label('Foto Tampak Depan')
+                            ->helperText('Upload foto tampak depan rumah'),
+                        FileUpload::make('foto_dalam_rumah')
+                            ->required()
+                            ->image()
+                            ->directory('weekly_report/dalam-rumah')
+                            ->maxSize(2048)
+                            ->label('Foto Dalam Rumah')
+                            ->helperText('Upload foto kondisi dalam rumah'),
+                        FileUpload::make('foto_tampak_samping')
+                            ->image()
+                            ->directory('weekly_report/tampak-samping')
+                            ->maxSize(2048)
+                            ->label('Foto Tampak Samping')
+                            ->helperText('Upload foto tampak samping rumah (opsional)'),
+                        FileUpload::make('foto_toilet')
+                            ->image()
+                            ->directory('weekly_report/toilet')
+                            ->maxSize(2048)
+                            ->label('Foto Toilet')
+                            ->helperText('Upload foto kondisi toilet (opsional)'),
+                        FileUpload::make('foto_dapur')
+                            ->image()
+                            ->directory('weekly_report/dapur')
+                            ->maxSize(2048)
+                            ->label('Foto Dapur')
+                            ->helperText('Upload foto kondisi dapur (opsional)'),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
 
                 Section::make('Catatan Tambahan')
                     ->schema([
@@ -134,14 +166,6 @@ class WeeklyReportsRelationManager extends RelationManager
                     ->searchable()
                     ->limit(30),
 
-                Tables\Columns\IconColumn::make('is_completed')
-                    ->boolean()
-                    ->label('Completed'),
-
-                Tables\Columns\TextColumn::make('completed_at')
-                    ->dateTime()
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('reporter.name')
                     ->label('Reported By'),
 
@@ -156,30 +180,20 @@ class WeeklyReportsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Add Weekly Report')
-                    ->url(fn() => ProjectWeeklyReportResource::getUrl('create', [
-                        'project_id' => $this->getOwnerRecord()->id
-                    ]))
-                    ->visible(fn() => $this->getOwnerRecord()->canStartWeek(
-                        ProjectWeeklyReport::getNextWeekNumber($this->getOwnerRecord()->id)
-                    )),
-            ])
-            ->recordActions([
-                EditAction::make(),
-                ViewAction::make(),
-                Action::make('complete')
-                    ->label('Mark Complete')
-                    ->action(function (ProjectWeeklyReport $record) {
-                        $record->update([
-                            'is_completed' => true,
-                            'completed_at' => now(),
+                    ->before(function (CreateAction $action) {
+                        $action->fillForm([
+                            'project_id' => $this->getOwnerRecord()->id,
+                            'reported_by' => Auth::user()->id,
                         ]);
                     })
-                    ->color('success')
-                    ->icon('heroicon-o-check')
-                    ->visible(fn(ProjectWeeklyReport $record) => !$record->is_completed),
+                    ->visible(fn() => $this->getOwnerRecord()->canStartWeek(
+                        ProjectWeeklyReport::getNextWeekNumber($this->getOwnerRecord()->id)
+                    ))
+                    ->modalWidth('7xl'),
             ])
-            ->toolbarActions([
-                // 
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->defaultSort('week_number', 'asc');
     }

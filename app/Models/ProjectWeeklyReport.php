@@ -15,7 +15,6 @@ class ProjectWeeklyReport extends Model
     protected $casts = [
         'checklists' => 'array',
         'attachments' => 'array',
-        'completed_at' => 'datetime',
     ];
 
     public function project(): BelongsTo
@@ -97,7 +96,6 @@ class ProjectWeeklyReport extends Model
 
         $previousWeek = ProjectWeeklyReport::where('project_id', $this->project_id)
             ->where('week_number', $this->week_number - 1)
-            ->where('is_completed', true)
             ->exists();
 
         return $previousWeek;
@@ -107,7 +105,6 @@ class ProjectWeeklyReport extends Model
     public static function getNextWeekNumber($projectId): int
     {
         $lastReport = ProjectWeeklyReport::where('project_id', $projectId)
-            ->where('is_completed', true)
             ->orderBy('week_number', 'desc')
             ->first();
 

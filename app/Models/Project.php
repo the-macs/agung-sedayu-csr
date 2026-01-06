@@ -157,7 +157,7 @@ class Project extends Model
 
     public function materials(): HasMany
     {
-        return $this->hasMany(ProjectMaterial::class);
+        return $this->hasMany(ProjectMaterial::class, 'reference_id', 'id');
     }
 
     public function generateMaterialsFromDefaults(): void
@@ -165,7 +165,7 @@ class Project extends Model
         $defaultMaterials = ItemMaterial::all();
 
         foreach ($defaultMaterials as $material) {
-            $projectMaterial = $this->projectMaterials()->create([
+            $projectMaterial = $this->materials()->create([
                 'project_id' => $this->id,
                 'name' => $material->name,
                 'uom' => $material->uom->name,
@@ -184,11 +184,6 @@ class Project extends Model
         }
     }
 
-    public function projectMaterials(): HasMany
-    {
-        return $this->hasMany(ProjectMaterial::class);
-    }
-
     public function weeklyReports(): HasMany
     {
         return $this->hasMany(ProjectWeeklyReport::class);
@@ -198,7 +193,6 @@ class Project extends Model
     public function getCurrentWeekAttribute()
     {
         $lastCompleted = $this->weeklyReports()
-            ->where('is_completed', true)
             ->orderBy('week_number', 'desc')
             ->first();
 
@@ -212,7 +206,6 @@ class Project extends Model
 
         $previousWeek = $this->weeklyReports()
             ->where('week_number', $weekNumber - 1)
-            ->where('is_completed', true)
             ->exists();
 
         return $previousWeek;

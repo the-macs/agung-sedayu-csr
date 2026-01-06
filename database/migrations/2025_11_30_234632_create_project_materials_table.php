@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('project_materials', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->foreignUlid('project_id');
+            $table->foreignUlid('reference_id');
             $table->string('name');
             $table->string('uom');
             $table->integer('quantity');

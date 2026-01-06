@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\Projects\Tables;
 
-use App\Filament\Actions\FinishProjectAction;
-use App\Filament\Actions\StartProjectAction;
+use App\Filament\Actions\Project\FinishProjectAction;
+use App\Filament\Actions\Project\StartProjectAction;
 use App\Models\Project;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;

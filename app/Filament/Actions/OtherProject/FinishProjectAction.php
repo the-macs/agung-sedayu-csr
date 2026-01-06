@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Actions;
+namespace App\Filament\Actions\OtherProject;
 
-use App\Models\Project;
+use App\Models\OtherProject;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 
@@ -21,7 +21,7 @@ class FinishProjectAction extends Action
                 - This action cannot be undone')
             ->modalIcon('heroicon-o-play')
             ->modalSubmitActionLabel('Yes, Finish Project')
-            ->action(function (Project $record): void {
+            ->action(function (OtherProject $record): void {
                 // Start the project
                 $record->endProject();
 
@@ -31,6 +31,6 @@ class FinishProjectAction extends Action
                     ->success()
                     ->send();
             })
-            ->visible(fn(Project $record): bool => $record->canBeFinish());
+            ->visible(fn(OtherProject $record): bool => $record->canBeFinish());
     }
 }
