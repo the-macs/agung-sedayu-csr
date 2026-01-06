@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\Projects\RelationManagers;
+namespace App\Filament\Resources\OtherProjects\RelationManagers;
 
 use App\Models\OtherProject;
 use App\Models\ProjectMaterial;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions;
 use Filament\Actions\Action;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateBulkAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;

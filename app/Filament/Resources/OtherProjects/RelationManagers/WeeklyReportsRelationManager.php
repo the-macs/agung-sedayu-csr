@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Projects\RelationManagers;
+namespace App\Filament\Resources\OtherProjects\RelationManagers;
 
 use App\Models\OtherProject;
-use App\Models\ProjectWeeklyReport;
-use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -17,8 +14,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class WeeklyReportsRelationManager extends RelationManager
 {
