@@ -7,8 +7,6 @@ use Filament\Auth\Http\Responses\LoginResponse;
 use Filament\Auth\Pages\Login;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Password;
-use Filament\Forms\Components\Checkbox;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +14,8 @@ use Throwable;
 
 class MyLogin extends Login
 {
+    protected string $view = 'filament.pages.auth.login';
+
     protected $remember = true;
 
     /**
